@@ -22,7 +22,7 @@
 using namespace std;
 
 #define PLUGIN_NAME "Benchmark"
-const char *default_config = QUOTE({
+static const char *default_config = QUOTE({
 		"plugin" : { 
 			"description" : "Simulated data generation for benchmark tests",
 			"type" : "string",
