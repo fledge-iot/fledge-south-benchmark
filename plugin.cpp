@@ -43,6 +43,15 @@ static const char *default_config = QUOTE({
 			"default" : "Random",
 			"order": "1",
 			"displayName": "Asset Name"
+			},
+		"numValues" : {
+			"description" : "The number of values to be returned per poll call",
+			"type" : "integer",
+			"default" : "1",
+			"minimum" : "1",
+			"maximum" : "100000",
+			"order": "3",
+			"displayName": "Values per call"
 			}
 		});
 		  
@@ -59,7 +68,7 @@ static PLUGIN_INFORMATION info = {
 	VERSION,                  // Version
 	0,    			  // Flags
 	PLUGIN_TYPE_SOUTH,        // Type
-	"1.0.0",                  // Interface version
+	"2.0.0",                  // Interface version
 	default_config		// Default configuration
 };
 
@@ -89,6 +98,15 @@ void setPluginConfig(Random *random, ConfigCategory *config)
 	}
 	if (config->itemExists("numAssets"))
 		random->setNumAssets(nAssets);
+
+	unsigned int numValues = stoul(config->getValue("numValues"), nullptr, 0);
+	if (numValues <= 0)
+	{
+		throw runtime_error("The value of numValues must be greater than 0");
+	}
+
+	if (config->itemExists("numValues"))
+		random->setNumValues(numValues);
 }
 
 /**
@@ -107,16 +125,9 @@ Random *random = new Random();
 }
 
 /**
- * Start the Async handling for the plugin
- */
-void plugin_start(PLUGIN_HANDLE *handle)
-{
-}
-
-/**
  * Poll for a plugin reading
  */
-Reading plugin_poll(PLUGIN_HANDLE *handle)
+std::vector<Reading*>* plugin_poll(PLUGIN_HANDLE *handle)
 {
 Random *random = (Random *)handle;
 
