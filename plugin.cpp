@@ -34,7 +34,7 @@ static const char *default_config = QUOTE({
 		       	"default" : "1",
 			"minimum" : "1",
 			"order": "2",
-		       	"displayName": "Number Of Assets",
+			"displayName": "Number of Assets",
 			"rule" : "value > 0"
 			},
 		"asset" : {
@@ -45,7 +45,7 @@ static const char *default_config = QUOTE({
 			"displayName": "Asset Name"
 			},
 		"numValues" : {
-			"description" : "The number of values to be returned per poll call",
+			"description" : "Number of values to be returned per poll call",
 			"type" : "integer",
 			"default" : "1",
 			"minimum" : "1",
@@ -91,22 +91,27 @@ void setPluginConfig(Random *random, ConfigCategory *config)
 	if (config->itemExists("asset"))
 		random->setAssetName(config->getValue("asset"));
 
-	unsigned int nAssets = stoul(config->getValue("numAssets"), nullptr, 0);
-	if (nAssets <= 0)
-	{
-		throw runtime_error("The value of numAssets must be greater than 0");
-	}
+	unsigned int nAssets = 1;
 	if (config->itemExists("numAssets"))
-		random->setNumAssets(nAssets);
-
-	unsigned int numValues = stoul(config->getValue("numValues"), nullptr, 0);
-	if (numValues <= 0)
 	{
-		throw runtime_error("The value of numValues must be greater than 0");
+		nAssets = stoul(config->getValue("numAssets"), nullptr, 0);
+		if (nAssets <= 0)
+		{
+			throw runtime_error("The value of numAssets, number of unique assets to simulate, must be greater than 0");
+		}
 	}
+	random->setNumAssets(nAssets);
 
+	unsigned int numValues = 1;
 	if (config->itemExists("numValues"))
-		random->setNumValues(numValues);
+	{
+		numValues = stoul(config->getValue("numValues"), nullptr, 0);
+		if (numValues <= 0)
+		{
+			throw runtime_error("The value of numValues, number of values to be returned per poll call, must be greater than 0");
+		}
+	}
+	random->setNumValues(numValues);
 }
 
 /**
@@ -114,9 +119,8 @@ void setPluginConfig(Random *random, ConfigCategory *config)
  */
 PLUGIN_HANDLE plugin_init(ConfigCategory *config)
 {
-Random *random = new Random();
+	Random *random = new Random();
 	random->setAssetName("Random");
-	random->setNumAssets(1);
 	
 	Logger::getLogger()->info("Benchmark plugin config: %s", config->toJSON().c_str());
 	setPluginConfig(random, config);
@@ -129,8 +133,7 @@ Random *random = new Random();
  */
 std::vector<Reading*>* plugin_poll(PLUGIN_HANDLE *handle)
 {
-Random *random = (Random *)handle;
-
+	Random *random = (Random *)handle;
 	return random->takeReading();
 }
 
@@ -151,8 +154,7 @@ void plugin_reconfigure(PLUGIN_HANDLE *handle, string& newConfig)
  */
 void plugin_shutdown(PLUGIN_HANDLE *handle)
 {
-Random *random = (Random *)handle;
-
+	Random *random = (Random *)handle;
 	delete random;
 }
 };
