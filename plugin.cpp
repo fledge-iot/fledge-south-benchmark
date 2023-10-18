@@ -51,7 +51,7 @@ static const char *default_config = QUOTE({
 			"minimum" : "1",
 			"maximum" : "100000",
 			"order": "3",
-			"displayName": "Values per call"
+			"displayName": "Values Per Call"
 			}
 		});
 		  
