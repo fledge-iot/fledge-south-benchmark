@@ -44,7 +44,7 @@ static const char *default_config = QUOTE({
 			"order": "1",
 			"displayName": "Asset Name"
 			},
-		"numValues" : {
+		"numReadingsPerPoll" : {
 			"description" : "Number of values to be returned per poll call",
 			"type" : "integer",
 			"default" : "1",
@@ -102,16 +102,16 @@ void setPluginConfig(Random *random, ConfigCategory *config)
 	}
 	random->setNumAssets(nAssets);
 
-	unsigned int numValues = 1;
-	if (config->itemExists("numValues"))
+	unsigned int numReadingsPerPoll = 1;
+	if (config->itemExists("numReadingsPerPoll"))
 	{
-		numValues = stoul(config->getValue("numValues"), nullptr, 0);
-		if (numValues <= 0)
+		numReadingsPerPoll = stoul(config->getValue("numReadingsPerPoll"), nullptr, 0);
+		if (numReadingsPerPoll <= 0)
 		{
-			throw runtime_error("The value of numValues, number of values to be returned per poll call, must be greater than 0");
+			throw runtime_error("The value of numReadingsPerPoll, number of values to be returned per poll call, must be greater than 0");
 		}
 	}
-	random->setNumValues(numValues);
+	random->setNumValues(numReadingsPerPoll);
 }
 
 /**
