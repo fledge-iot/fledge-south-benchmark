@@ -15,12 +15,12 @@ class Random {
 	public:
 		Random();
 		~Random();
-		std::vector<Reading*>*	takeReading();
+		std::vector<Reading*>*	takeReadings();
 		std::string	getAssetName() { return m_assetName; }
 		unsigned long	getNumAssets() { return m_numAssets; }
 		void	setAssetName(const std::string& assetName) { m_assetName = assetName; }
 		void	setNumAssets(unsigned long numAssets) { if (numAssets > 0) { m_numAssets = numAssets; } }
-		void	setNumValues(unsigned long numReadingsPerPoll) { if (numReadingsPerPoll > 0) { m_numReadingsPerPoll = numReadingsPerPoll; } }
+		void	setNumReadingsPerPoll(unsigned long numReadingsPerPoll) { if (numReadingsPerPoll > 0) { m_numReadingsPerPoll = numReadingsPerPoll; } }
 
 	private:
 		long		m_lastValue;

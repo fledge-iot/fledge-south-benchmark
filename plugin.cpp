@@ -45,13 +45,13 @@ static const char *default_config = QUOTE({
 			"displayName": "Asset Name"
 			},
 		"numReadingsPerPoll" : {
-			"description" : "Number of values to be returned per poll call",
+			"description" : "Number of readings to be returned per poll call",
 			"type" : "integer",
 			"default" : "1",
 			"minimum" : "1",
 			"maximum" : "100000",
 			"order": "3",
-			"displayName": "Values Per Call"
+			"displayName": "Readings Per Call"
 			}
 		});
 		  
@@ -111,7 +111,7 @@ void setPluginConfig(Random *random, ConfigCategory *config)
 			throw runtime_error("The value of numReadingsPerPoll, number of values to be returned per poll call, must be greater than 0");
 		}
 	}
-	random->setNumValues(numReadingsPerPoll);
+	random->setNumReadingsPerPoll(numReadingsPerPoll);
 }
 
 /**
@@ -134,7 +134,7 @@ PLUGIN_HANDLE plugin_init(ConfigCategory *config)
 std::vector<Reading*>* plugin_poll(PLUGIN_HANDLE *handle)
 {
 	Random *random = (Random *)handle;
-	return random->takeReading();
+	return random->takeReadings();
 }
 
 /**

@@ -30,7 +30,7 @@ Random::~Random()
 /**
  * Take a reading from the random "sensor"
  */
-std::vector<Reading*>* Random::takeReading()
+std::vector<Reading*>* Random::takeReadings()
 {
 	std::vector<Reading*> *readings = new std::vector<Reading *>;
 	for (int i=0; i < m_numReadingsPerPoll; i++)
