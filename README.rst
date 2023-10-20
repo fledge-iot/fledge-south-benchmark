@@ -1,5 +1,7 @@
 Fledge "benchmark" C++ South plugin
 
+`See documentation <docs/index.rst>`_
+
 Build
 ----
 To build Fledge Benchmark C++ South plugin:
