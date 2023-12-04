@@ -22,29 +22,35 @@
 using namespace std;
 
 #define PLUGIN_NAME "Benchmark"
+
 static const char *default_config = QUOTE({
-		"plugin" : { 
+		"plugin" :
+			{ 
 			"description" : "Simulated data generation for benchmark tests",
 			"type" : "string",
-		       	"default" : PLUGIN_NAME,
-			"readonly" : "true" },
-		"numAssets" : {
+		    "default" : PLUGIN_NAME,
+			"readonly" : "true" 
+			},
+		"numAssets" : 
+			{
 			"description" : "Number of unique assets to simulate",
 			"type" : "integer",
-		       	"default" : "1",
+		    "default" : "1",
 			"minimum" : "1",
 			"order": "2",
 			"displayName": "Number of Assets",
 			"rule" : "value > 0"
 			},
-		"asset" : {
+		"asset" : 
+			{
 			"description" : "Asset name prefix",
 			"type" : "string",
 			"default" : "Random",
 			"order": "1",
 			"displayName": "Asset Name"
 			},
-		"numReadingsPerPoll" : {
+		"numReadingsPerPoll" :
+			{
 			"description" : "Number of readings to be returned per poll call",
 			"type" : "integer",
 			"default" : "1",
@@ -52,9 +58,18 @@ static const char *default_config = QUOTE({
 			"maximum" : "100000",
 			"order": "3",
 			"displayName": "Readings Per Call"
-			}
+			},
+		"model": {
+			"description": "The machine learning model to use inspect the captured image for defects",
+			"displayName": "QA Model",
+			"order": "4",
+			"type": "bucket",
+			"properties": "{\"constant\": {\"type\": \"MLModel\",\"name\": \"BadBottle\"}, \"key\": {\"product\": {\"description\": \"The bottle type being produced\", \"displayName\": \"Bottle Type\",\"type\": \"enumeration\",\"options\": [\"Wine Bottle\",\"Bear Bottle\",\"Whiskey Bottle\",\"Milk Bottle\"],\"default\": \"Milk Bottle\"}},\"properties\": {\"version\": {\"description\": \"The model version to use, 0 represents the latest version\",\"displayName\": \"Version\",\"type\": \"string\",\"default\": \"\"}}}",
+			"default": "{\"type\": \"MLModel\",\"name\": \"BadBottle\",\"product\": \"Wine Bottle\",\"version\": \"0\" }"
+		    }
 		});
-		  
+
+
 /**
  * The Random plugin interface
  */
@@ -112,6 +127,26 @@ void setPluginConfig(Random *random, ConfigCategory *config)
 		}
 	}
 	random->setNumReadingsPerPoll(numReadingsPerPoll);
+
+	if (config->itemExists("model"))
+	{
+		Logger::getLogger()->info("model/bucket config item: type=%s ", config->getType("model").c_str());
+		const string &s = config->getValue("model");
+		Logger::getLogger()->info("model/bucket config item: value=%s ", s.c_str());
+		const vector<pair<string,string>>* vec = config->parseBucketItemValue(s);
+		if (vec)
+		{
+			for (const auto & v: *vec)
+				Logger::getLogger()->info("BucketItemValue: key=%s, value=%s", v.first.c_str(), v.second.c_str());
+		}
+		else
+			Logger::getLogger()->info("parseBucketItemValue() returned NULL");
+
+		delete vec;
+		
+		const string &s2 = config->getItemAttribute("model", ConfigCategory::ItemAttribute::BUCKET_PROPERTIES_ATTR);
+		Logger::getLogger()->info("model config item: bucketProperties=%s ", s2.c_str());
+	}
 }
 
 /**
