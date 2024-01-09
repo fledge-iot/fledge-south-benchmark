@@ -34,7 +34,7 @@ static const char *default_config = QUOTE({
 		       	"default" : "1",
 			"minimum" : "1",
 			"order": "2",
-		       	"displayName": "Number Of Assets",
+			"displayName": "Number of Assets",
 			"rule" : "value > 0"
 			},
 		"asset" : {
@@ -43,6 +43,15 @@ static const char *default_config = QUOTE({
 			"default" : "Random",
 			"order": "1",
 			"displayName": "Asset Name"
+			},
+		"numReadingsPerPoll" : {
+			"description" : "Number of readings to be returned per poll call",
+			"type" : "integer",
+			"default" : "1",
+			"minimum" : "1",
+			"maximum" : "100000",
+			"order": "3",
+			"displayName": "Readings Per Call"
 			}
 		});
 		  
@@ -59,7 +68,7 @@ static PLUGIN_INFORMATION info = {
 	VERSION,                  // Version
 	0,    			  // Flags
 	PLUGIN_TYPE_SOUTH,        // Type
-	"1.0.0",                  // Interface version
+	"2.0.0",                  // Interface version
 	default_config		// Default configuration
 };
 
@@ -82,13 +91,27 @@ void setPluginConfig(Random *random, ConfigCategory *config)
 	if (config->itemExists("asset"))
 		random->setAssetName(config->getValue("asset"));
 
-	unsigned int nAssets = stoul(config->getValue("numAssets"), nullptr, 0);
-	if (nAssets <= 0)
-	{
-		throw runtime_error("The value of numAssets must be greater than 0");
-	}
+	unsigned int nAssets = 1;
 	if (config->itemExists("numAssets"))
-		random->setNumAssets(nAssets);
+	{
+		nAssets = stoul(config->getValue("numAssets"), nullptr, 0);
+		if (nAssets <= 0)
+		{
+			throw runtime_error("The value of numAssets, number of unique assets to simulate, must be greater than 0");
+		}
+	}
+	random->setNumAssets(nAssets);
+
+	unsigned int numReadingsPerPoll = 1;
+	if (config->itemExists("numReadingsPerPoll"))
+	{
+		numReadingsPerPoll = stoul(config->getValue("numReadingsPerPoll"), nullptr, 0);
+		if (numReadingsPerPoll <= 0)
+		{
+			throw runtime_error("The value of numReadingsPerPoll, number of values to be returned per poll call, must be greater than 0");
+		}
+	}
+	random->setNumReadingsPerPoll(numReadingsPerPoll);
 }
 
 /**
@@ -96,9 +119,8 @@ void setPluginConfig(Random *random, ConfigCategory *config)
  */
 PLUGIN_HANDLE plugin_init(ConfigCategory *config)
 {
-Random *random = new Random();
+	Random *random = new Random();
 	random->setAssetName("Random");
-	random->setNumAssets(1);
 	
 	Logger::getLogger()->info("Benchmark plugin config: %s", config->toJSON().c_str());
 	setPluginConfig(random, config);
@@ -107,20 +129,12 @@ Random *random = new Random();
 }
 
 /**
- * Start the Async handling for the plugin
- */
-void plugin_start(PLUGIN_HANDLE *handle)
-{
-}
-
-/**
  * Poll for a plugin reading
  */
-Reading plugin_poll(PLUGIN_HANDLE *handle)
+std::vector<Reading*>* plugin_poll(PLUGIN_HANDLE *handle)
 {
-Random *random = (Random *)handle;
-
-	return random->takeReading();
+	Random *random = (Random *)handle;
+	return random->takeReadings();
 }
 
 /**
@@ -140,8 +154,7 @@ void plugin_reconfigure(PLUGIN_HANDLE *handle, string& newConfig)
  */
 void plugin_shutdown(PLUGIN_HANDLE *handle)
 {
-Random *random = (Random *)handle;
-
+	Random *random = (Random *)handle;
 	delete random;
 }
 };
