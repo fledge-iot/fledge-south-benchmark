@@ -28,15 +28,6 @@ static const char *default_config = QUOTE({
 			"type" : "string",
 		       	"default" : PLUGIN_NAME,
 			"readonly" : "true" },
-		"numAssets" : {
-			"description" : "Number of unique assets to simulate",
-			"type" : "integer",
-		       	"default" : "1",
-			"minimum" : "1",
-			"order": "2",
-			"displayName": "Number of Assets",
-			"rule" : "value > 0"
-			},
 		"asset" : {
 			"description" : "Asset name prefix",
 			"type" : "string",
@@ -44,13 +35,31 @@ static const char *default_config = QUOTE({
 			"order": "1",
 			"displayName": "Asset Name"
 			},
+		"numAssets" : {
+			"description" : "Number of unique assets to simulate",
+			"type" : "integer",
+			"default" : "1",
+			"minimum" : "1",
+			"order": "2",
+			"displayName": "Number of Assets",
+			"rule" : "value > 0"
+			},
+		"numDatapoints" : {
+			"description" : "Number of unique datapoints in each assets to simulate",
+			"type" : "integer",
+			"default" : "1",
+			"minimum" : "1",
+			"order": "3",
+			"displayName": "Number of Datapoints",
+			"rule" : "value > 0"
+			},
 		"numReadingsPerPoll" : {
 			"description" : "Number of readings to be returned per poll call",
 			"type" : "integer",
 			"default" : "1",
 			"minimum" : "1",
 			"maximum" : "100000",
-			"order": "3",
+			"order": "4",
 			"displayName": "Readings Per Call"
 			}
 		});
@@ -101,6 +110,17 @@ void setPluginConfig(Random *random, ConfigCategory *config)
 		}
 	}
 	random->setNumAssets(nAssets);
+
+	unsigned int nDatapoints = 1;
+	if (config->itemExists("numDatapoints"))
+	{
+		nDatapoints = stoul(config->getValue("numDatapoints"), nullptr, 0);
+		if (nDatapoints <= 0)
+		{
+			throw runtime_error("The value of numDatapoints, number of unique data points to simulate, must be greater than 0");
+		}
+	}
+	random->setNumDatapoints(nDatapoints);
 
 	unsigned int numReadingsPerPoll = 1;
 	if (config->itemExists("numReadingsPerPoll"))
