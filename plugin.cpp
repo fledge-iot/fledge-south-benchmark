@@ -45,7 +45,7 @@ static const char *default_config = QUOTE({
 			"rule" : "value > 0"
 			},
 		"numDatapoints" : {
-			"description" : "Number of unique datapoints in each assets to simulate",
+			"description" : "Number of unique datapoints in each asset to simulate",
 			"type" : "integer",
 			"default" : "1",
 			"minimum" : "1",
@@ -106,7 +106,7 @@ void setPluginConfig(Random *random, ConfigCategory *config)
 		nAssets = stoul(config->getValue("numAssets"), nullptr, 0);
 		if (nAssets <= 0)
 		{
-			throw runtime_error("The value of numAssets, number of unique assets to simulate, must be greater than 0");
+			throw runtime_error("The number of unique assets to simulate must be greater than 0");
 		}
 	}
 	random->setNumAssets(nAssets);
@@ -117,7 +117,7 @@ void setPluginConfig(Random *random, ConfigCategory *config)
 		nDatapoints = stoul(config->getValue("numDatapoints"), nullptr, 0);
 		if (nDatapoints <= 0)
 		{
-			throw runtime_error("The value of numDatapoints, number of unique data points to simulate, must be greater than 0");
+			throw runtime_error("The number of unique data points to simulate must be greater than 0");
 		}
 	}
 	random->setNumDatapoints(nDatapoints);

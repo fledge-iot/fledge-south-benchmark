@@ -40,7 +40,7 @@ std::vector<Reading*>* Random::takeReadings()
 
 		std::vector<Datapoint *> values;
 		values.emplace_back(new Datapoint("random", value));
-		// crete more datapoints
+		// create more datapoints
 		for (int j=1; j < m_numDatapoints; j++)
 		{
 			std::string dpName = "random"+ std::to_string(j+1);
