@@ -37,7 +37,19 @@ std::vector<Reading*>* Random::takeReadings()
 	{
 		m_lastValue += ((rand() % 100) > 50 ? 1 : -1) * ((rand() % 100) / 20);
 		DatapointValue value(m_lastValue);
-		Reading *in = new Reading(m_assetName+std::to_string(m_assetCount++ % m_numAssets + 1), new Datapoint("random", value));
+
+		std::vector<Datapoint *> values;
+		values.emplace_back(new Datapoint("random", value));
+		// create more datapoints
+		for (int j=1; j < m_numDatapoints; j++)
+		{
+			std::string dpName = "random"+ std::to_string(j+1);
+			m_lastValue += ((rand() % 100) > 50 ? 1 : -1) * ((rand() % 100) / 20);
+			DatapointValue dpValue(m_lastValue);
+			values.emplace_back(new Datapoint(dpName, dpValue));
+		}
+
+		Reading *in = new Reading(m_assetName+std::to_string(m_assetCount++ % m_numAssets + 1), values);
 		readings->push_back(in);
 	}
 
